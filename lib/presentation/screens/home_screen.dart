@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:washout/presentation/blocs/post_bloc/post_bloc.dart';
-// import 'package:washout/data/models/post_model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:washout/presentation/blocs/auth_bloc/auth_bloc.dart';
-
+import 'package:washout/presentation/blocs/post_bloc/post_bloc.dart';
+import 'package:washout/data/models/post_model.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
             icon: Icon(Icons.logout),
             onPressed: () {
               context.read<AuthBloc>().add(LogoutEvent());
-              Navigator.pushReplacementNamed(context, '/');
+              context.go('/');
             },
           ),
         ],
@@ -33,22 +33,11 @@ class HomeScreen extends StatelessWidget {
                 return ListTile(
                   title: Text(post.title),
                   subtitle: Text(post.body),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () {
-                          // Implement edit functionality
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          context.read<PostBloc>().add(DeletePost(post.id));
-                        },
-                      ),
-                    ],
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      context.read<PostBloc>().add(DeletePost(post.id));
+                    },
                   ),
                 );
               },
@@ -61,10 +50,57 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Implement create post functionality
+          _showCreatePostDialog(context);
         },
         child: Icon(Icons.add),
       ),
+    );
+  }
+
+  void _showCreatePostDialog(BuildContext context) {
+    final _titleController = TextEditingController();
+    final _bodyController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Create Post'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(labelText: 'Title'),
+              ),
+              TextField(
+                controller: _bodyController,
+                decoration: InputDecoration(labelText: 'Body'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final title = _titleController.text;
+                final body = _bodyController.text;
+                if (title.isNotEmpty && body.isNotEmpty) {
+                  final post = Post(id: DateTime.now().millisecondsSinceEpoch, title: title, body: body);
+                  context.read<PostBloc>().add(CreatePost(post));
+                  Navigator.pop(context);
+                }
+              },
+              child: Text('Create'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
