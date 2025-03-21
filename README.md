@@ -1,4 +1,4 @@
-# wastout
+# washout
 
 New post application publishing application.
 
