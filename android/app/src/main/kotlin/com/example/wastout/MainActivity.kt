@@ -1,4 +1,4 @@
-package com.example.wastout
+package com.example.washout
 
 import io.flutter.embedding.android.FlutterActivity
 
