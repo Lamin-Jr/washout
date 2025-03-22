@@ -1,4 +1,4 @@
-// lib/data/models/post_model.dart
+
 class Post {
   final int id;
   final String title;
